@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Predict — SmartEnergy AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-cpu-fill text-cyan me-3"></i>Prediction Interface</h1>
+  <p class="page-sub">Input household parameters to get instant predictions from all 4 ML models.</p>
+</div>
+
+<div class="row g-4">
+  <!-- ── Input Form ──────────────────────────────────────────────────── -->
+  <div class="col-lg-5">
+    <div class="glass-card sticky-form">
+      <div class="glass-card-header"><i class="bi bi-sliders me-2 text-cyan"></i>Input Parameters</div>
+      <div class="glass-card-body">
+        <form method="POST" id="predictForm">
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label-custom">Household Size</label>
+              <div class="input-group-custom">
+                <i class="bi bi-people-fill"></i>
+                <input type="number" name="household_size" class="form-input-dark"
+                       min="1" max="10" value="4" required/>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label-custom">Appliance Count</label>
+              <div class="input-group-custom">
+                <i class="bi bi-plug-fill"></i>
+                <input type="number" name="appliance_count" class="form-input-dark"
+                       min="1" max="25" value="8" required/>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <label class="form-label-custom">Avg Temp (°C)</label>
+              <div class="input-group-custom">
+                <i class="bi bi-thermometer-half"></i>
+                <input type="number" name="avg_temperature" class="form-input-dark"
+                       min="-10" max="55" step="0.1" value="28" required/>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label-custom">Working Hours</label>
+              <div class="input-group-custom">
+                <i class="bi bi-clock-fill"></i>
+                <input type="number" name="working_hours" class="form-input-dark"
+                       min="0" max="24" step="0.5" value="8" required/>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <label class="form-label-custom">Solar Usage (kWh)</label>
+              <div class="input-group-custom">
+                <i class="bi bi-sun-fill"></i>
+                <input type="number" name="solar_usage" class="form-input-dark"
+                       min="0" max="30" step="0.1" value="2" required/>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label-custom">Tariff (₹/kWh)</label>
+              <div class="input-group-custom">
+                <i class="bi bi-cash-stack"></i>
+                <input type="number" name="electricity_tariff" class="form-input-dark"
+                       min="1" max="20" step="0.1" value="7" required/>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <label class="form-label-custom">Day Type</label>
+              <select name="day_type" class="form-input-dark">
+                <option value="Weekday">Weekday</option>
+                <option value="Weekend">Weekend</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label-custom">Prev Consumption (kWh)</label>
+              <div class="input-group-custom">
+                <i class="bi bi-arrow-repeat"></i>
+                <input type="number" name="previous_consumption" class="form-input-dark"
+                       min="0" max="200" step="0.1" value="35" required/>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-cyan w-100 mt-4 btn-lg" id="submitBtn">
+            <i class="bi bi-lightning-charge me-2"></i>Run All Models
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────────────── -->
+  <div class="col-lg-7">
+    {% if result %}
+    <div class="results-appear">
+      <!-- ── Consumption Card ─────────────────────────────────────── -->
+      <div class="result-hero-card mb-4">
+        <div class="result-hero-label">Predicted Consumption</div>
+        <div class="result-hero-value">
+          {{ result.consumption }} <span class="result-unit">kWh</span>
+        </div>
+        <div class="result-hero-sub">≈ ₹{{ result.monthly_cost }} / month at current tariff</div>
+        <div class="consumption-bar-wrap mt-3">
+          <div class="consumption-bar" style="width: {{ [result.consumption / 1.2, 100] | min }}%"
+               data-val="{{ result.consumption }}"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-1 small text-muted-custom">
+          <span>0 kWh</span><span>120 kWh</span>
+        </div>
+      </div>
+
+      <!-- ── Model Result Cards ──────────────────────────────────── -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+          <div class="pred-card">
+            <div class="pred-icon" style="--c:#ffd166"><i class="bi bi-diagram-3-fill"></i></div>
+            <div class="pred-label">High Usage?</div>
+            <div class="pred-value {% if result.high_usage_raw %}text-danger{% else %}text-success{% endif %}">
+              {{ result.high_usage }}
+            </div>
+            <div class="pred-model">Decision Tree</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="pred-card">
+            <div class="pred-icon" style="--c:#06d6a0"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div class="pred-label">Efficiency</div>
+            <div class="pred-value
+              {% if result.efficiency=='High' %}text-success
+              {% elif result.efficiency=='Medium' %}text-warning
+              {% else %}text-danger{% endif %}">
+              {{ result.efficiency }}
+            </div>
+            <div class="pred-model">KNN Classifier</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="pred-card">
+            <div class="pred-icon" style="--c:#ff6b6b"><i class="bi bi-record-circle-fill"></i></div>
+            <div class="pred-label">Cluster</div>
+            <div class="pred-value text-cyan" style="font-size:0.9rem">{{ result.cluster_label }}</div>
+            <div class="pred-model">K-Means</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Energy Tips ─────────────────────────────────────────── -->
+      {% if tips %}
+      <div class="glass-card">
+        <div class="glass-card-header"><i class="bi bi-lightbulb-fill text-yellow me-2"></i>Optimization Insights</div>
+        <div class="glass-card-body">
+          <ul class="tips-list">
+            {% for tip in tips %}
+            <li class="tip-item">{{ tip }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <!-- ── Placeholder ─────────────────────────────────────────────── -->
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+      <h4 class="text-white mt-3">Ready to Predict</h4>
+      <p class="text-muted-custom">Fill in the household parameters on the left and click <strong>Run All Models</strong> to see instant predictions from all 4 ML algorithms.</p>
+      <div class="model-pill-list mt-4">
+        <span class="mpill" style="--c:#00e5ff">Linear Regression</span>
+        <span class="mpill" style="--c:#ffd166">Decision Tree</span>
+        <span class="mpill" style="--c:#06d6a0">KNN</span>
+        <span class="mpill" style="--c:#ff6b6b">K-Means</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById("predictForm").addEventListener("submit", function(){
+    const btn = document.getElementById("submitBtn");
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Computing...';
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Model Metrics — SmartEnergy AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-speedometer2 text-cyan me-3"></i>Model Performance Metrics</h1>
+  <p class="page-sub">Comprehensive evaluation of all 4 trained machine learning models.</p>
+</div>
+
+{% if metrics %}
+
+<!-- ── Linear Regression ───────────────────────────────────────────────── -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header">
+    <i class="bi bi-graph-up-arrow me-2" style="color:#00e5ff"></i>Linear Regression — Energy Consumption Prediction
+  </div>
+  <div class="glass-card-body">
+    <div class="row g-3 text-center">
+      <div class="col-md-4">
+        <div class="metric-block" style="--accent:#00e5ff">
+          <div class="metric-value">{{ metrics.regression.r2 }}</div>
+          <div class="metric-name">R² Score</div>
+          <div class="metric-desc">Variance explained by model</div>
+          <div class="metric-bar"><div style="width:{{ (metrics.regression.r2 * 100) | round }}%"></div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-block" style="--accent:#ffd166">
+          <div class="metric-value">{{ metrics.regression.mae }}</div>
+          <div class="metric-name">MAE (kWh)</div>
+          <div class="metric-desc">Mean Absolute Error</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-block" style="--accent:#ff6b6b">
+          <div class="metric-value">{{ metrics.regression.rmse }}</div>
+          <div class="metric-name">RMSE (kWh)</div>
+          <div class="metric-desc">Root Mean Squared Error</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Decision Tree ──────────────────────────────────────────────────── -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header">
+    <i class="bi bi-diagram-3-fill me-2" style="color:#ffd166"></i>Decision Tree — High Usage Classification
+  </div>
+  <div class="glass-card-body">
+    <div class="row g-3 text-center">
+      {% for key, label, color in [
+        ("accuracy","Accuracy","#00e5ff"),
+        ("precision","Precision","#ffd166"),
+        ("recall","Recall","#06d6a0"),
+        ("f1","F1 Score","#ff6b6b")
+      ] %}
+      <div class="col-6 col-md-3">
+        <div class="metric-block" style="--accent:{{ color }}">
+          <div class="metric-value">{{ metrics.decision_tree[key] }}</div>
+          <div class="metric-name">{{ label }}</div>
+          <div class="metric-bar"><div style="width:{{ (metrics.decision_tree[key] * 100) | round }}%"></div></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if metrics.decision_tree.confusion_matrix %}
+    <div class="mt-3">
+      <h6 class="text-muted-custom">Confusion Matrix</h6>
+      <div class="cm-table-wrap">
+        <table class="cm-table">
+          <thead><tr><th></th><th>Pred: Low</th><th>Pred: High</th></tr></thead>
+          <tbody>
+            <tr><td>Act: Low</td>
+              <td class="cm-tp">{{ metrics.decision_tree.confusion_matrix[0][0] }}</td>
+              <td class="cm-fp">{{ metrics.decision_tree.confusion_matrix[0][1] }}</td>
+            </tr>
+            <tr><td>Act: High</td>
+              <td class="cm-fn">{{ metrics.decision_tree.confusion_matrix[1][0] }}</td>
+              <td class="cm-tn">{{ metrics.decision_tree.confusion_matrix[1][1] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── KNN ────────────────────────────────────────────────────────────── -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header">
+    <i class="bi bi-grid-3x3-gap-fill me-2" style="color:#06d6a0"></i>KNN Classifier — Efficiency Category
+  </div>
+  <div class="glass-card-body">
+    <div class="row g-3 text-center">
+      {% for key, label, color in [
+        ("accuracy","Accuracy","#00e5ff"),
+        ("precision","Precision","#ffd166"),
+        ("recall","Recall","#06d6a0"),
+        ("f1","F1 Score","#ff6b6b")
+      ] %}
+      <div class="col-6 col-md-3">
+        <div class="metric-block" style="--accent:{{ color }}">
+          <div class="metric-value">{{ metrics.knn[key] }}</div>
+          <div class="metric-name">{{ label }}</div>
+          <div class="metric-bar"><div style="width:{{ (metrics.knn[key] * 100) | round }}%"></div></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ── K-Means ────────────────────────────────────────────────────────── -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header">
+    <i class="bi bi-record-circle-fill me-2" style="color:#ff6b6b"></i>K-Means Clustering — Household Segmentation
+  </div>
+  <div class="glass-card-body">
+    <div class="row g-3 text-center mb-3">
+      <div class="col-md-4">
+        <div class="metric-block" style="--accent:#ff6b6b">
+          <div class="metric-value">{{ metrics.kmeans.n_clusters }}</div>
+          <div class="metric-name">Clusters</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-block" style="--accent:#ffd166">
+          <div class="metric-value">{{ metrics.kmeans.inertia }}</div>
+          <div class="metric-name">Inertia</div>
+          <div class="metric-desc">Sum of squared distances</div>
+        </div>
+      </div>
+    </div>
+    <h6 class="text-muted-custom mb-2">Cluster Summary</h6>
+    <div class="table-responsive">
+      <table class="table table-dark table-hover table-sm">
+        <thead><tr>
+          <th>Cluster</th><th>Name</th><th>Avg (kWh)</th><th>Min</th><th>Max</th><th>Count</th>
+        </tr></thead>
+        <tbody>
+          {% for row in metrics.kmeans.cluster_summary %}
+          <tr>
+            <td>{{ row.Cluster }}</td>
+            <td>{{ metrics.kmeans.cluster_names[row.Cluster | string] }}</td>
+            <td><strong class="text-cyan">{{ row.mean }}</strong></td>
+            <td>{{ row.min }}</td>
+            <td>{{ row.max }}</td>
+            <td>{{ row.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+  <h4 class="text-white mt-3">No Metrics Found</h4>
+  <p class="text-muted-custom">Please generate the dataset and train models first.</p>
+  <a href="/data" class="btn btn-cyan mt-2">Generate Dataset</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Dataset — SmartEnergy AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-database-fill text-cyan me-3"></i>Dataset Management</h1>
+  <p class="page-sub">Generate synthetic data or upload your own CSV to train the models.</p>
+</div>
+
+<div class="row g-4">
+  <!-- ── Generate Synthetic Data ─────────────────────────────────────── -->
+  <div class="col-lg-6">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <i class="bi bi-magic text-cyan me-2"></i>Generate Synthetic Dataset
+      </div>
+      <div class="glass-card-body">
+        <p class="text-muted-custom mb-4">
+          Creates a realistic energy dataset with engineered correlations between features and target.
+          Automatically retrains all 4 ML models.
+        </p>
+        <form method="POST">
+          <label class="form-label-custom">Number of Records</label>
+          <input type="range" class="form-range range-cyan mb-2" name="n_records"
+                 id="nRange" min="500" max="5000" step="100" value="1500"
+                 oninput="document.getElementById('nVal').textContent=this.value"/>
+          <div class="text-center mb-3">
+            <span class="badge-val" id="nVal">1500</span> records
+          </div>
+          <div class="data-feature-grid mb-4">
+            <span class="dfeat">✅ Household Size</span>
+            <span class="dfeat">✅ Appliance Count</span>
+            <span class="dfeat">✅ Avg Temperature</span>
+            <span class="dfeat">✅ Working Hours</span>
+            <span class="dfeat">✅ Solar Usage</span>
+            <span class="dfeat">✅ Electricity Tariff</span>
+            <span class="dfeat">✅ Day Type</span>
+            <span class="dfeat">✅ Prev Consumption</span>
+          </div>
+          <button type="submit" name="generate" value="1" class="btn btn-cyan w-100">
+            <i class="bi bi-lightning-charge me-2"></i>Generate & Retrain Models
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Upload CSV ─────────────────────────────────────────────────── -->
+  <div class="col-lg-6">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <i class="bi bi-upload text-yellow me-2"></i>Upload Custom CSV
+      </div>
+      <div class="glass-card-body">
+        <p class="text-muted-custom mb-4">
+          Upload your own dataset. Required columns:
+          <code>Household_Size, Appliance_Count, Avg_Temperature, Working_Hours,
+          Solar_Usage, Electricity_Tariff, Day_Type, Previous_Consumption, Energy_Consumption</code>
+        </p>
+        <form method="POST" enctype="multipart/form-data">
+          <div class="upload-drop-zone mb-3" id="dropZone">
+            <i class="bi bi-cloud-upload-fill fs-2 text-cyan d-block mb-2"></i>
+            <span>Drop CSV here or click to browse</span>
+            <input type="file" name="csv_file" accept=".csv" class="upload-input" id="csvFile"
+                   onchange="document.getElementById('fname').textContent=this.files[0]?.name||''"/>
+          </div>
+          <div class="text-center text-muted-custom mb-3 small" id="fname"></div>
+          <button type="submit" class="btn btn-outline-yellow w-100">
+            <i class="bi bi-cloud-upload me-2"></i>Upload & Preview
+          </button>
+        </form>
+
+        <hr class="divider my-4"/>
+        <a href="/data/synthetic_energy_data.csv" class="btn btn-sm btn-outline-light w-100" download>
+          <i class="bi bi-download me-2"></i>Download Current Dataset (CSV)
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if preview %}
+<!-- ── Data Preview ──────────────────────────────────────────────────── -->
+<div class="glass-card mt-4">
+  <div class="glass-card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-eye text-cyan me-2"></i>Data Preview (First 20 rows)</span>
+    <span class="badge-count">Showing 20 rows</span>
+  </div>
+  <div class="glass-card-body table-responsive">
+    {{ preview | safe }}
+  </div>
+</div>
+
+<div class="glass-card mt-4">
+  <div class="glass-card-header">
+    <i class="bi bi-calculator text-green me-2"></i>Descriptive Statistics
+  </div>
+  <div class="glass-card-body table-responsive">
+    {{ stats | safe }}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Drag and drop highlight
+  const dz = document.getElementById("dropZone");
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("dragover"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("dragover");
+    document.getElementById("csvFile").files = e.dataTransfer.files;
+    document.getElementById("fname").textContent = e.dataTransfer.files[0]?.name || "";
+  });
+  dz.addEventListener("click", () => document.getElementById("csvFile").click());
+</script>
+{% endblock %}

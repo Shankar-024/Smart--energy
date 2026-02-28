@@ -1,0 +1,91 @@
+{
+  "regression": {
+    "r2": 0.9255,
+    "mae": 1.5779,
+    "rmse": 2.026
+  },
+  "decision_tree": {
+    "accuracy": 0.8467,
+    "precision": 0.8417,
+    "recall": 0.7891,
+    "f1": 0.8145,
+    "confusion_matrix": [
+      [
+        153,
+        19
+      ],
+      [
+        27,
+        101
+      ]
+    ]
+  },
+  "knn": {
+    "accuracy": 0.84,
+    "precision": 0.8501,
+    "recall": 0.84,
+    "f1": 0.8235,
+    "confusion_matrix": [
+      [
+        228,
+        0,
+        8
+      ],
+      [
+        1,
+        4,
+        17
+      ],
+      [
+        22,
+        0,
+        20
+      ]
+    ],
+    "classes": [
+      "High",
+      "Low",
+      "Medium"
+    ]
+  },
+  "kmeans": {
+    "inertia": 8615.26,
+    "n_clusters": 4,
+    "cluster_summary": [
+      {
+        "Cluster": 0,
+        "mean": 21.03,
+        "min": 5.2,
+        "max": 34.2,
+        "count": 325
+      },
+      {
+        "Cluster": 1,
+        "mean": 25.63,
+        "min": 14.59,
+        "max": 40.92,
+        "count": 398
+      },
+      {
+        "Cluster": 2,
+        "mean": 12.58,
+        "min": 1.0,
+        "max": 22.94,
+        "count": 404
+      },
+      {
+        "Cluster": 3,
+        "mean": 24.07,
+        "min": 7.23,
+        "max": 43.21,
+        "count": 373
+      }
+    ],
+    "cluster_names": {
+      "0": "Moderate User \u26a1",
+      "1": "Moderate User \u26a1",
+      "2": "Eco Saver \ud83c\udf31",
+      "3": "Moderate User \u26a1"
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}SmartEnergy AI — Home{% endblock %}
+
+{% block content %}
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section class="hero-section text-center py-5">
+  <div class="hero-bg-grid"></div>
+  <div class="position-relative z-2">
+    <div class="hero-badge mb-3">🏆 AIML Department Hackathon 2025</div>
+    <h1 class="hero-title">Smart Energy<br><span class="text-cyan">Consumption</span> Prediction</h1>
+    <p class="hero-subtitle mx-auto">
+      An end-to-end ML system combining <strong>Linear Regression</strong>, <strong>Decision Tree</strong>,
+      <strong>KNN</strong>, and <strong>K-Means</strong> to predict, classify, and optimize
+      household energy consumption — with real-time insights.
+    </p>
+    <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
+      <a href="/predict" class="btn btn-cyan btn-lg px-4"><i class="bi bi-cpu me-2"></i>Run Prediction</a>
+      <a href="/data" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-database me-2"></i>Explore Data</a>
+      <a href="/visualize" class="btn btn-outline-cyan btn-lg px-4"><i class="bi bi-graph-up me-2"></i>Visualize</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ROW ────────────────────────────────────────────────────────── -->
+<div class="row g-3 mt-2">
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center">
+      <div class="stat-icon"><i class="bi bi-database-fill"></i></div>
+      <div class="stat-num">1,500</div>
+      <div class="stat-label">Synthetic Records</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center">
+      <div class="stat-icon"><i class="bi bi-cpu-fill"></i></div>
+      <div class="stat-num">4</div>
+      <div class="stat-label">ML Algorithms</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center">
+      <div class="stat-icon"><i class="bi bi-bar-chart-fill"></i></div>
+      <div class="stat-num">8</div>
+      <div class="stat-label">Input Features</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center">
+      <div class="stat-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+      <div class="stat-num">Real-time</div>
+      <div class="stat-label">Predictions</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ML MODELS ────────────────────────────────────────────────────────── -->
+<h2 class="section-title mt-5 mb-4">ML Architecture</h2>
+<div class="row g-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="model-card">
+      <div class="model-icon-wrap" style="--accent:#00e5ff">
+        <i class="bi bi-graph-up-arrow"></i>
+      </div>
+      <h5 class="model-title">Linear Regression</h5>
+      <span class="model-task">Task: Regression</span>
+      <p class="model-desc">Predicts exact energy consumption (kWh) based on all household features. Optimized with StandardScaler for fast convergence.</p>
+      <div class="model-metrics-mini">R² · MAE · RMSE</div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="model-card">
+      <div class="model-icon-wrap" style="--accent:#ffd166">
+        <i class="bi bi-diagram-3-fill"></i>
+      </div>
+      <h5 class="model-title">Decision Tree</h5>
+      <span class="model-task">Task: Binary Classification</span>
+      <p class="model-desc">Classifies households as High Usage vs Normal. Interpretable splits reveal which features drive excessive consumption.</p>
+      <div class="model-metrics-mini">Accuracy · Precision · Recall · F1</div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="model-card">
+      <div class="model-icon-wrap" style="--accent:#06d6a0">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+      </div>
+      <h5 class="model-title">KNN Classifier</h5>
+      <span class="model-task">Task: Multi-class Classification</span>
+      <p class="model-desc">Predicts Efficiency Category (Low/Medium/High) using distance-weighted k=7 neighbors on normalized feature space.</p>
+      <div class="model-metrics-mini">Accuracy · Precision · Recall · F1</div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="model-card">
+      <div class="model-icon-wrap" style="--accent:#ff6b6b">
+        <i class="bi bi-record-circle-fill"></i>
+      </div>
+      <h5 class="model-title">K-Means</h5>
+      <span class="model-task">Task: Clustering</span>
+      <p class="model-desc">Segments households into 4 consumption clusters — from Eco Savers to Energy Intensive — enabling targeted interventions.</p>
+      <div class="model-metrics-mini">Inertia · Cluster Profiles</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ─────────────────────────────────────────────────────────── -->
+<h2 class="section-title mt-5 mb-4">Dataset Features</h2>
+<div class="row g-3">
+  {% set features = [
+    ("bi-people-fill","Household Size","Number of people (1–7). Strong positive correlation with base energy load.","#00e5ff"),
+    ("bi-plug-fill","Appliance Count","Total appliances (2–20). Each appliance adds ~0.8 kWh daily load.","#ffd166"),
+    ("bi-thermometer-half","Avg Temperature","Ambient temp (10–45°C). Higher temps drive HVAC consumption.","#ff6b6b"),
+    ("bi-clock-fill","Working Hours","Active device usage hours per day (0–16h).","#06d6a0"),
+    ("bi-sun-fill","Solar Usage","Solar energy generated (0–10 kWh). Directly offsets grid consumption.","#ffd700"),
+    ("bi-cash-stack","Electricity Tariff","Cost per kWh (₹3.5–₹12). Affects optimization decisions.","#c77dff"),
+    ("bi-calendar-week","Day Type","Weekday vs Weekend — weekends show ~10% higher consumption.","#00e5ff"),
+    ("bi-arrow-repeat","Previous Consumption","Yesterday's usage. Strong autocorrelation with today's demand.","#ff6b6b")
+  ] %}
+  {% for icon, name, desc, color in features %}
+  <div class="col-sm-6 col-lg-3">
+    <div class="feature-chip">
+      <i class="bi {{ icon }}" style="color:{{ color }}"></i>
+      <div>
+        <div class="feature-name">{{ name }}</div>
+        <div class="feature-desc">{{ desc }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── TEAM ─────────────────────────────────────────────────────────────── -->
+<h2 class="section-title mt-5 mb-4">Team</h2>
+<div class="row g-3 justify-content-center">
+  {% set team = [
+    ("Pavankumar","ML Engineer","bi-person-workspace","#00e5ff"),
+    ("Samarth","Data Scientist","bi-bar-chart-line-fill","#ffd166"),
+    ("Sandesh","Full Stack Dev","bi-code-slash","#06d6a0"),
+    ("Shankar","AI Researcher","bi-lightbulb-fill","#ff6b6b"),
+  ] %}
+  {% for name, role, icon, color in team %}
+  <div class="col-6 col-md-3">
+    <div class="team-card text-center">
+      <div class="team-avatar" style="--c:{{ color }}"><i class="bi {{ icon }}"></i></div>
+      <div class="team-name">{{ name }}</div>
+      <div class="team-role">{{ role }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
